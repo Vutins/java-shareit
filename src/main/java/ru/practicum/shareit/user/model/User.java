@@ -14,13 +14,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class User {
 
-    @NotNull
     private Long id;
-    @NotNull
-    @NotBlank
+    @NotBlank(message = "имя не может быть пустым")
     private String name;
-    @Email
-    @NotNull
-    @NotBlank
+    @Email(message = "некорректный email")
+    @NotBlank(message = "email не может быть пустым")
     private String email;
 }
