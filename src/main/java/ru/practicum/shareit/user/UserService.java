@@ -20,21 +20,24 @@ public class UserService {
     private static final String PROGRAM_LEVEL = "UserService";
 
     public UserDto create(UserDto user) {
-        if (user.getId() != null) {
-            throw new ValidationException("При создании пользователя ID должен быть null");
-        }
         User userCreate = UserDtoMapper.toUser(user);
-
-        userStorage.create(userCreate);
-        return UserDtoMapper.toUserDto(userCreate);
+        return UserDtoMapper.toUserDto(userStorage.create(userCreate));
     }
 
-    public UserDto update(Long id, UserDto user) {
+    public UserDto update(Long id, UserDto userDto) {
         ValidationTool.checkId(id, PROGRAM_LEVEL, "User не может быть обновлен по id = null");
-        ValidationTool.userCheck(userStorage.getUserById(id), PROGRAM_LEVEL);
 
-        userStorage.update(id, UserDtoMapper.toUser(user));
-        return UserDtoMapper.toUserDto(userStorage.getUserById(id));
+        User existingUser = userStorage.getUserById(id);
+        ValidationTool.userCheck(existingUser, PROGRAM_LEVEL);
+
+        User updatedUser = User.builder()
+                .id(id)
+                .name(userDto.getName() != null ? userDto.getName() : existingUser.getName())
+                .email(userDto.getEmail() != null ? userDto.getEmail() : existingUser.getEmail())
+                .build();
+
+        userStorage.update(id, updatedUser);
+        return UserDtoMapper.toUserDto(updatedUser);
     }
 
     public UserDto getUserById(Long id) {

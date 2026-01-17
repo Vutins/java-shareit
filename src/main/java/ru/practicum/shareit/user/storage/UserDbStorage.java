@@ -91,7 +91,7 @@ public class UserDbStorage implements UserStorage {
             userUpdate = jdbc.queryForObject(FIND_USER_BY_ID_QUERY, mapper, id);
         } catch (EmptyResultDataAccessException ignored) {
             log.warn("UserDbStorage: Не удалось получить объект User по его ID - не найден в приложении");
-            throw new NotFoundException("UserDbStorage: User c ID: \" + id + \" не найден в приложении");
+            throw new NotFoundException("UserDbStorage: User c ID: " + id + " не найден в приложении");
         }
         return userUpdate;
     }
@@ -109,7 +109,7 @@ public class UserDbStorage implements UserStorage {
             user = jdbc.queryForObject(FIND_USER_BY_ID_QUERY, mapper, id);
         } catch (EmptyResultDataAccessException ignored) {
             log.warn("UserDbStorage: Не удалось получить объект User по его ID - не найден в приложении");
-            throw new NotFoundException("UserDbStorage: User c ID: \" + id + \" не найден в приложении");
+            throw new NotFoundException("UserDbStorage: User c ID: " + id + " не найден в приложении");
         }
         return user;
     }

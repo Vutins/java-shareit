@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 
 @Slf4j
 @RestController
@@ -29,7 +28,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto update(@PathVariable Long id, @RequestBody UserDto user) {
+    public UserDto update(@PathVariable Long id, @Valid @RequestBody UserDto user) {
         log.info("запрос на обновление пользователя");
         return userService.update(id, user);
     }
