@@ -28,10 +28,10 @@ public class Item {
     private String description;
     @NotNull
     @JsonProperty("available")
-    private boolean available;
+    private Boolean available;
     @NotNull
     @JsonProperty("owner")
-    private User owner;
+    private Long owner;
     @JsonProperty("request")
-    private ItemRequest request;
+    private Long request;
 }
