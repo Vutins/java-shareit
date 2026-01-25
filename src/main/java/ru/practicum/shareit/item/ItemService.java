@@ -13,7 +13,6 @@ import ru.practicum.shareit.validation.ValidationTool;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service

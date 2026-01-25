@@ -159,7 +159,6 @@ public class ItemDbStorage implements ItemStorage {
     @Override
     public List<Item> searchItem(String text) {
         String searchPattern = "%" + text.trim() + "%";
-
         String LIST_ITEM_QUERY = """
             SELECT i.*
             FROM items i
