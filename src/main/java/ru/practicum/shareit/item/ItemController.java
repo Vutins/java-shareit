@@ -20,18 +20,18 @@ public class ItemController {
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public ItemDto create(@Valid @RequestBody ItemDto itemDto,
-                          @Valid @RequestHeader("X-Sharer-User-Id") Long user_id ) {
+                          @Valid @RequestHeader("X-Sharer-User-Id") Long userId ) {
         log.info("запрос на создание вещи");
-        return itemService.create(itemDto, user_id);
+        return itemService.create(itemDto, userId);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ItemDto update(@PathVariable Long id,
                           @Valid @RequestBody ItemDto itemDto,
-                           @Valid @RequestHeader("X-Sharer-User-Id") Long user_id) {
+                           @Valid @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("запрос на обновление вещи");
-        return itemService.update(id, itemDto, user_id);
+        return itemService.update(id, itemDto, userId);
     }
 
     @GetMapping("/{id}")
@@ -43,9 +43,9 @@ public class ItemController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ItemDto> getAllItemsByUser(@Valid @RequestHeader("X-Sharer-User-Id") Long user_id) {
+    public List<ItemDto> getAllItemsByUser(@Valid @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("запрос на получение вещей пользователя");
-        return itemService.getAllItemsByUser(user_id);
+        return itemService.getAllItemsByUser(userId);
     }
 
     @GetMapping("/search")

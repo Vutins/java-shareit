@@ -28,7 +28,7 @@ public class ItemDbStorage implements ItemStorage {
     private final UserRowMapper userMapper;
 
     @Override
-    public Item create(Item item, Long user_id) {
+    public Item create(Item item, Long userId) {
         final String CREATE_ITEM_QUERY = """
             INSERT INTO items (name, description, available, owner_id)
             VALUES (?, ?, ?, ?);
@@ -40,7 +40,7 @@ public class ItemDbStorage implements ItemStorage {
                 WHERE id = ?
                 """;
 
-        List<User> userCheck = jdbc.query(GET_USER_CHECK, userMapper, user_id);
+        List<User> userCheck = jdbc.query(GET_USER_CHECK, userMapper, userId);
         if (userCheck.isEmpty()) {
             throw new NotFoundException("user с таким id не существует");
         }
@@ -49,7 +49,7 @@ public class ItemDbStorage implements ItemStorage {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                user_id
+                userId
         };
 
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
@@ -74,13 +74,13 @@ public class ItemDbStorage implements ItemStorage {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                user_id,
+                userId,
                 item.getRequest()
         );
     }
 
     @Override
-    public Item update(Long id, Item item, Long user_id) {
+    public Item update(Long id, Item item, Long userId) {
         final String UPDATE_ITEM_QUERY = """
             UPDATE items SET name = ?, description = ?, available = ?, owner_id = ?
             WHERE id = ?;
@@ -96,12 +96,12 @@ public class ItemDbStorage implements ItemStorage {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                user_id,
+                userId,
                 id
         };
         Item itemCheck = jdbc.queryForObject(FIND_ITEM_BY_ID_QUERY, itemMapper, id);
 
-        if (itemCheck.getOwner().equals(user_id)) {
+        if (itemCheck.getOwner().equals(userId)) {
                 int rowsUpdate = jdbc.update(UPDATE_ITEM_QUERY, params);
                 if (rowsUpdate == 0) {
                     throw new InternalServerException("ItemDbStorage: Не удалось обновить данные Item");

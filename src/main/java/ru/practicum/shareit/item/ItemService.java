@@ -22,16 +22,16 @@ public class ItemService {
     private final ItemDbStorage itemDbStorage;
     private static final String PROGRAM_LEVEL = "ItemService";
 
-    public ItemDto create(ItemDto itemDto, Long user_id) {
+    public ItemDto create(ItemDto itemDto, Long userId) {
         Item itemCreate = ItemDtoMapper.toItem(itemDto);
-        ValidationTool.checkId(user_id, PROGRAM_LEVEL, "при создании вещи user_id не должен равняться null");
+        ValidationTool.checkId(userId, PROGRAM_LEVEL, "при создании вещи user_id не должен равняться null");
         if (itemCreate.getName() == null || itemCreate.getName().isBlank()) {
             throw new InternalServerException("имя вещи не может быть пустым");
         }
-        return ItemDtoMapper.toItemDto(itemDbStorage.create(itemCreate, user_id));
+        return ItemDtoMapper.toItemDto(itemDbStorage.create(itemCreate, userId));
     }
 
-    public ItemDto update(Long id, ItemDto itemDto, Long user_id) {
+    public ItemDto update(Long id, ItemDto itemDto, Long userId) {
         ValidationTool.checkId(id, PROGRAM_LEVEL, "вещь не может быть обновлена по id = null");
 
         Item item1 = itemDbStorage.getItemById(id);
@@ -45,7 +45,7 @@ public class ItemService {
             .request(itemDto.getRequest() != null ? itemDto.getRequest() : item1.getRequest())
             .build();
 
-        itemDbStorage.update(id, updateItem, user_id);
+        itemDbStorage.update(id, updateItem, userId);
         return ItemDtoMapper.toItemDto(updateItem);
     }
 
