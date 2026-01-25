@@ -1,12 +1,58 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.ItemDto;
 
-/**
- * TODO Sprint add-controllers.
- */
+import java.util.List;
+
+@Slf4j
 @RestController
 @RequestMapping("/items")
+@RequiredArgsConstructor
 public class ItemController {
+
+    private final ItemService itemService;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.OK)
+    public ItemDto create(@Valid @RequestBody ItemDto itemDto,
+                          @Valid @RequestHeader("X-Sharer-User-Id") Long user_id ) {
+        log.info("запрос на создание вещи");
+        return itemService.create(itemDto, user_id);
+    }
+
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ItemDto update(@PathVariable Long id,
+                          @Valid @RequestBody ItemDto itemDto,
+                           @Valid @RequestHeader("X-Sharer-User-Id") Long user_id) {
+        log.info("запрос на обновление вещи");
+        return itemService.update(id, itemDto, user_id);
+    }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ItemDto getItemById(@PathVariable Long id) {
+        log.info("запрос на вывод вещи");
+        return itemService.getItemById(id);
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<ItemDto> getAllItemsByUser(@Valid @RequestHeader("X-Sharer-User-Id") Long user_id) {
+        log.info("запрос на получение вещей пользователя");
+        return itemService.getAllItemsByUser(user_id);
+    }
+
+    @GetMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    public List<ItemDto> searchItem(@RequestParam String text) {
+        log.info("запрос на поиск вещей");
+        return itemService.searchItem(text);
+    }
 }

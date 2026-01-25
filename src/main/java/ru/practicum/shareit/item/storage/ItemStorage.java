@@ -6,17 +6,13 @@ import java.util.List;
 
 public interface ItemStorage {
 
-    Item create(Item item);
+    Item create(Item item, Long user_id);
 
-    Item update(Long id, Item item);
+    Item update(Long id, Item item, Long user_id);
 
     Item getItemById(Long id);
 
     List<Item> getAllItemsByUser(Long userId);
 
-//    List<Item> searchItem(String text);
-//
-//    boolean itemExists(Long itemId);
-//
-//    void delete(Long id);
+    List<Item> searchItem(String text);
 }
