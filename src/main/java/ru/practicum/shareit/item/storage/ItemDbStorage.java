@@ -29,18 +29,18 @@ public class ItemDbStorage implements ItemStorage {
 
     @Override
     public Item create(Item item, Long userId) {
-        final String CREATE_ITEM_QUERY = """
+        final String createItemQuery = """
             INSERT INTO items (name, description, available, owner_id)
             VALUES (?, ?, ?, ?);
         """;
 
-        final String GET_USER_CHECK = """
+        final String getUserCheck = """
                 SELECT *
                 FROM users
                 WHERE id = ?
                 """;
 
-        List<User> userCheck = jdbc.query(GET_USER_CHECK, userMapper, userId);
+        List<User> userCheck = jdbc.query(getUserCheck, userMapper, userId);
         if (userCheck.isEmpty()) {
             throw new NotFoundException("user с таким id не существует");
         }
@@ -56,7 +56,7 @@ public class ItemDbStorage implements ItemStorage {
 
         int affectedRows = jdbc.update(connection -> {
             PreparedStatement ps = connection
-                    .prepareStatement(CREATE_ITEM_QUERY, Statement.RETURN_GENERATED_KEYS);
+                    .prepareStatement(createItemQuery, Statement.RETURN_GENERATED_KEYS);
 
             for (int idx = 0; idx < params.length; idx++) {
                 ps.setObject(idx + 1, params[idx]);
@@ -69,7 +69,7 @@ public class ItemDbStorage implements ItemStorage {
             throw new InternalServerException("ItemDbStorage: Не удалось сохранить данные Item");
         }
 
-        return new Item (
+        return new Item(
                 generatedId,
                 item.getName(),
                 item.getDescription(),
@@ -81,12 +81,12 @@ public class ItemDbStorage implements ItemStorage {
 
     @Override
     public Item update(Long id, Item item, Long userId) {
-        final String UPDATE_ITEM_QUERY = """
+        final String updateItemQuery = """
             UPDATE items SET name = ?, description = ?, available = ?, owner_id = ?
             WHERE id = ?;
         """;
 
-        final String FIND_ITEM_BY_ID_QUERY = """
+        final String findItemByIdQuery = """
             SELECT *
             FROM items
             WHERE id = ?;
@@ -99,10 +99,10 @@ public class ItemDbStorage implements ItemStorage {
                 userId,
                 id
         };
-        Item itemCheck = jdbc.queryForObject(FIND_ITEM_BY_ID_QUERY, itemMapper, id);
+        Item itemCheck = jdbc.queryForObject(findItemByIdQuery, itemMapper, id);
 
         if (itemCheck.getOwner().equals(userId)) {
-                int rowsUpdate = jdbc.update(UPDATE_ITEM_QUERY, params);
+                int rowsUpdate = jdbc.update(updateItemQuery, params);
                 if (rowsUpdate == 0) {
                     throw new InternalServerException("ItemDbStorage: Не удалось обновить данные Item");
                 }
@@ -112,7 +112,7 @@ public class ItemDbStorage implements ItemStorage {
 
         Item itemUpdate;
         try {
-            itemUpdate = jdbc.queryForObject(FIND_ITEM_BY_ID_QUERY, itemMapper, id);
+            itemUpdate = jdbc.queryForObject(findItemByIdQuery, itemMapper, id);
         } catch (EmptyResultDataAccessException ignored) {
             log.warn("ItemDbStorage: Не удалось получить объект Item по его ID - не найден в приложении");
             throw new NotFoundException("ItemDbStorage: Item c ID: " + id + " не найден в приложении");
@@ -122,7 +122,7 @@ public class ItemDbStorage implements ItemStorage {
 
     @Override
     public Item getItemById(Long id) {
-        final String FIND_ITEM_BY_ID_QUERY = """
+        final String findItemByIdQuery = """
             SELECT *
             FROM items
             WHERE id = ?;
@@ -130,7 +130,7 @@ public class ItemDbStorage implements ItemStorage {
 
         Item item;
         try {
-            item = jdbc.queryForObject(FIND_ITEM_BY_ID_QUERY, itemMapper, id);
+            item = jdbc.queryForObject(findItemByIdQuery, itemMapper, id);
         } catch (EmptyResultDataAccessException ignored) {
             log.warn("ItemDbStorage: Не удалось получить объект Item по его ID - не найден в приложении");
             throw new NotFoundException("ItemDbStorage: Item c ID: " + id + " не найден в приложении");
@@ -140,7 +140,7 @@ public class ItemDbStorage implements ItemStorage {
 
     @Override
     public List<Item> getAllItemsByUser(Long userId) {
-        final String FIND_ALL_ITEMS_BY_OWNER_ID = """
+        final String findAllItemsByOwnerId = """
                 SELECT *
                 FROM items
                 WHERE owner_id = ?;
@@ -148,7 +148,7 @@ public class ItemDbStorage implements ItemStorage {
 
         List<Item> items;
         try {
-            items = jdbc.query(FIND_ALL_ITEMS_BY_OWNER_ID, itemMapper, userId);
+            items = jdbc.query(findAllItemsByOwnerId, itemMapper, userId);
             return items != null ? items : Collections.emptyList();
         } catch (Exception e) {
             log.error("Ошибка при получении всех вещей пользователя с ID: {}", userId, e);
@@ -159,7 +159,7 @@ public class ItemDbStorage implements ItemStorage {
     @Override
     public List<Item> searchItem(String text) {
         String searchPattern = "%" + text.trim() + "%";
-        String LIST_ITEM_QUERY = """
+        String listItemQuery = """
             SELECT i.*
             FROM items i
             WHERE i.available = true
@@ -170,7 +170,7 @@ public class ItemDbStorage implements ItemStorage {
 
         List<Item> itemSearch;
         try {
-            itemSearch = jdbc.query(LIST_ITEM_QUERY, itemMapper, searchPattern, searchPattern);
+            itemSearch = jdbc.query(listItemQuery, itemMapper, searchPattern, searchPattern);
         } catch (Exception e) {
             log.error("Ошибка при получении всех вещей при поиске");
             return Collections.emptyList();

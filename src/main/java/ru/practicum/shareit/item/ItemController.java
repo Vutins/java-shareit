@@ -20,7 +20,7 @@ public class ItemController {
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public ItemDto create(@Valid @RequestBody ItemDto itemDto,
-                          @Valid @RequestHeader("X-Sharer-User-Id") Long userId ) {
+                          @Valid @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("запрос на создание вещи");
         return itemService.create(itemDto, userId);
     }

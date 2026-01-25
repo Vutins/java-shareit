@@ -29,7 +29,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-        final String CREATE_USER_QUERY = """
+        final String createUserQuery = """
             INSERT INTO users (name, email)
             VALUES (?, ?);
         """;
@@ -43,7 +43,7 @@ public class UserDbStorage implements UserStorage {
 
         int affectedRows = jdbc.update(connection -> {
             PreparedStatement ps = connection
-                    .prepareStatement(CREATE_USER_QUERY, Statement.RETURN_GENERATED_KEYS);
+                    .prepareStatement(createUserQuery, Statement.RETURN_GENERATED_KEYS);
             for (int idx = 0; idx < params.length; idx++) {
                 ps.setObject(idx + 1, params[idx]);
             }
@@ -64,8 +64,14 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(Long id, User user) {
-        final String UPDATE_USER_QUERY = """
+        final String updateUserQuery = """
             UPDATE users SET name = ?, email = ?
+            WHERE id = ?;
+        """;
+
+        final String findUserByIdQuery = """
+            SELECT *
+            FROM users
             WHERE id = ?;
         """;
 
@@ -75,30 +81,24 @@ public class UserDbStorage implements UserStorage {
                 id
         };
 
-        int rowsUpdate = jdbc.update(UPDATE_USER_QUERY, params);
-        if (rowsUpdate == 0) {
-            throw  new InternalServerException("BaseDbStorage: Не удалось обновить данные User");
-        }
-
-        final String FIND_USER_BY_ID_QUERY = """
-            SELECT *
-            FROM users
-            WHERE id = ?;
-        """;
-
         User userUpdate;
         try {
-            userUpdate = jdbc.queryForObject(FIND_USER_BY_ID_QUERY, mapper, id);
+            userUpdate = jdbc.queryForObject(findUserByIdQuery, mapper, id);
         } catch (EmptyResultDataAccessException ignored) {
             log.warn("UserDbStorage: Не удалось получить объект User по его ID - не найден в приложении");
             throw new NotFoundException("UserDbStorage: User c ID: " + id + " не найден в приложении");
+        }
+
+        int rowsUpdate = jdbc.update(updateUserQuery, params);
+        if (rowsUpdate == 0) {
+            throw  new InternalServerException("BaseDbStorage: Не удалось обновить данные User");
         }
         return userUpdate;
     }
 
     @Override
     public User getUserById(Long id) {
-        final String FIND_USER_BY_ID_QUERY = """
+        final String findUserByIdQuery = """
             SELECT *
             FROM users
             WHERE id = ?;
@@ -106,7 +106,7 @@ public class UserDbStorage implements UserStorage {
 
         User user;
         try {
-            user = jdbc.queryForObject(FIND_USER_BY_ID_QUERY, mapper, id);
+            user = jdbc.queryForObject(findUserByIdQuery, mapper, id);
         } catch (EmptyResultDataAccessException ignored) {
             log.warn("UserDbStorage: Не удалось получить объект User по его ID - не найден в приложении");
             throw new NotFoundException("UserDbStorage: User c ID: " + id + " не найден в приложении");
@@ -116,10 +116,10 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public boolean deleteUserById(Long id) {
-        final String DELETE_USER_QUERY = """
+        final String deleteUserQuery = """
             DELETE FROM users
             WHERE id = ?;
         """;
-        return jdbc.update(DELETE_USER_QUERY, id) > 0;
+        return jdbc.update(deleteUserQuery, id) > 0;
     }
 }
