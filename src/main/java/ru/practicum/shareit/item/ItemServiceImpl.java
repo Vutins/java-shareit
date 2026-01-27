@@ -8,7 +8,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemDtoMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.storage.ItemInMemoryStorage;
+import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.validation.ValidationTool;
 
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemInMemoryStorage itemStorage;
+    private final ItemStorage itemStorage;
     private final UserService userService;
     private static final String PROGRAM_LEVEL = "ItemService";
 
