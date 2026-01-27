@@ -13,7 +13,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
