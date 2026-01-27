@@ -39,6 +39,12 @@ public class ItemServiceImpl implements ItemService {
         if (userService.getUserById(userId) == null) {
             throw new NotFoundException("не найден владелец вещи по id = " + userId);
         }
+        if (itemCreate.getAvailable() == null) {
+            throw new InternalServerException("заполните занятость вещи");
+        }
+        if (itemCreate.getDescription() == null) {
+            throw new InternalServerException("описание вещи не может равняться null");
+        }
         return ItemDtoMapper.toItemDto(itemStorage.create(itemCreate, userId));
     }
 
@@ -49,6 +55,10 @@ public class ItemServiceImpl implements ItemService {
         Item item1 = itemStorage.getItemById(id).orElseThrow(
                 () -> new NotFoundException("вещь с id = " + id + " не найдена")
         );
+
+        if (!item1.getOwner().equals(userId)) {
+            throw new NotFoundException("id владельца не совпадает с передаваемым id");
+        }
 
         Item updateItem = Item.builder()
             .id(id)

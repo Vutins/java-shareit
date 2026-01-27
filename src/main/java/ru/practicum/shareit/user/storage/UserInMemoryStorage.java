@@ -19,11 +19,6 @@ public class UserInMemoryStorage implements UserStorage {
     @Override
     public User create(User user) {
         user.setId(nextId());
-        for (Map.Entry<Long, User> entry : usersMap.entrySet()) {
-            if (entry.getValue().getEmail().equals(user.getEmail())) {
-                throw new InternalServerException("user с таким email уже существует");
-            }
-        }
         usersMap.put(user.getId(), user);
 
         return user.builder()
@@ -53,6 +48,25 @@ public class UserInMemoryStorage implements UserStorage {
     public boolean deleteUserById(Long id) {
         usersMap.remove(id);
         return !usersMap.containsKey(id);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return Optional.empty();
+        }
+
+        for (Map.Entry<Long, User> entry : usersMap.entrySet()) {
+            User user = entry.getValue();
+            if (email.equals(user.getEmail())) {
+                return Optional.of(User.builder()
+                        .id(user.getId())
+                        .name(user.getName())
+                        .email(user.getEmail())
+                        .build());
+            }
+        }
+        return Optional.empty();
     }
 
     private static Long nextId() {

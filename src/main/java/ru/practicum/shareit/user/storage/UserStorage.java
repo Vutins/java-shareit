@@ -13,4 +13,6 @@ public interface UserStorage {
     Optional<User> getUserById(Long id);
 
     boolean deleteUserById(Long id);
+
+    Optional<User> findByEmail(String email);
 }

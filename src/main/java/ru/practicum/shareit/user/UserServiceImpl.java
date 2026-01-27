@@ -12,6 +12,8 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserInMemoryStorage;
 import ru.practicum.shareit.validation.ValidationTool;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,9 @@ public class UserServiceImpl implements UserService {
         if (user.getEmail() == null) {
             throw new InternalServerException("для создания пользователя укажите email");
         }
+        findByEmail(user.getEmail()).ifPresent(existingUser -> {
+            throw new InternalServerException("Пользователь с email " + user.getEmail() + " уже существует");
+        });
         User userCreate = UserDtoMapper.toUser(user);
         return UserDtoMapper.toUserDto(userStorage.create(userCreate));
     }
@@ -38,6 +43,16 @@ public class UserServiceImpl implements UserService {
                         String.format("Пользователь с ID %d не найден", id)
                 ));
         ValidationTool.userCheck(existingUser, PROGRAM_LEVEL);
+
+        String newEmail = userDto.getEmail() != null ? userDto.getEmail() : existingUser.getEmail();
+
+        if (userDto.getEmail() != null && !existingUser.getEmail().equals(newEmail)) {
+            userStorage.findByEmail(newEmail).ifPresent(otherUser -> {
+                if (!otherUser.getId().equals(id)) {
+                    throw new InternalServerException("Email " + newEmail + " уже используется другим пользователем");
+                }
+            });
+        }
 
         User updatedUser = User.builder()
                 .id(id)
@@ -86,5 +101,9 @@ public class UserServiceImpl implements UserService {
                 "%s : User ID %s успешно удален",
                 PROGRAM_LEVEL, String.valueOf(id));
         log.info(message);
+    }
+
+    private Optional<User> findByEmail(String email) {
+        return userStorage.findByEmail(email);
     }
 }
