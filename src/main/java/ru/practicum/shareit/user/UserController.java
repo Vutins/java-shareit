@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 
+import java.net.URI;
+
 @Slf4j
 @RestController
 @RequestMapping(path = "/users")
@@ -18,25 +20,30 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserDto> create(@Valid @RequestBody UserDto user) {
         log.info("запрос на создание пользователя");
-        return ResponseEntity.ok(userService.create(user));
+        UserDto createdUser = userService.create(user);
+        return ResponseEntity
+                .created(URI.create("/users/" + createdUser.getId()))
+                .body(createdUser);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<UserDto> update(@PathVariable Long id, @Valid @RequestBody UserDto user) {
         log.info("запрос на обновление пользователя");
-        return ResponseEntity.ok(userService.update(id, user));
+        UserDto updatedUser = userService.update(id, user);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         log.info("запрос на вывод пользователя по id");
-        return ResponseEntity.ok(userService.getUserById(id));
+        UserDto user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserById(@PathVariable Long id) {
         log.info("запрос на удаление пользователя");
         userService.deleteUserById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

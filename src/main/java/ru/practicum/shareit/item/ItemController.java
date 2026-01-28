@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 
+import java.net.URI;
 import java.util.List;
 
 @Slf4j
@@ -19,34 +20,41 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<ItemDto> create(@Valid @RequestBody ItemDto itemDto,
-                                          @Valid @RequestHeader("X-Sharer-User-Id") Long userId) {
+                                          @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("запрос на создание вещи");
-        return ResponseEntity.ok().body(itemService.create(itemDto, userId));
+        ItemDto createdItem = itemService.create(itemDto, userId);
+        return ResponseEntity
+                .created(URI.create("/items/" + createdItem.getId()))
+                .body(createdItem);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<ItemDto> update(@PathVariable Long id,
-                          @Valid @RequestBody ItemDto itemDto,
-                           @Valid @RequestHeader("X-Sharer-User-Id") Long userId) {
+                                          @Valid @RequestBody ItemDto itemDto,
+                                          @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("запрос на обновление вещи");
-        return ResponseEntity.ok(itemService.update(id, itemDto, userId));
+        ItemDto updatedItem = itemService.update(id, itemDto, userId);
+        return ResponseEntity.ok(updatedItem);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ItemDto> getItemById(@PathVariable Long id) {
         log.info("запрос на вывод вещи");
-        return ResponseEntity.ok(itemService.getItemById(id));
+        ItemDto item = itemService.getItemById(id);
+        return ResponseEntity.ok(item);
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getAllItemsByUser(@Valid @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<List<ItemDto>> getAllItemsByUser(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("запрос на получение вещей пользователя");
-        return ResponseEntity.ok(itemService.getAllItemsByUser(userId));
+        List<ItemDto> items = itemService.getAllItemsByUser(userId);
+        return ResponseEntity.ok(items);
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<ItemDto>> searchItem(@RequestParam String text) {
         log.info("запрос на поиск вещей");
-        return ResponseEntity.ok(itemService.searchItem(text));
+        List<ItemDto> items = itemService.searchItem(text);
+        return ResponseEntity.ok(items);
     }
 }
