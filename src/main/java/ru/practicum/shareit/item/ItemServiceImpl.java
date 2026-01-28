@@ -6,16 +6,14 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.InternalServerException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.ItemDtoMapper;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.validation.ValidationTool;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -24,11 +22,12 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemStorage itemStorage;
     private final UserService userService;
+    private final ItemMapper itemMapper;
     private static final String PROGRAM_LEVEL = "ItemService";
 
     @Override
     public ItemDto create(ItemDto itemDto, Long userId) {
-        Item itemCreate = ItemDtoMapper.toItem(itemDto);
+        Item itemCreate = itemMapper.toEntity(itemDto);
         ValidationTool.checkId(userId, PROGRAM_LEVEL, "при создании вещи user_id не должен равняться null");
 
         if (itemCreate.getName() == null || itemCreate.getName().isBlank()) {
@@ -43,32 +42,26 @@ public class ItemServiceImpl implements ItemService {
         if (itemCreate.getDescription() == null) {
             throw new InternalServerException("описание вещи не может равняться null");
         }
-        return ItemDtoMapper.toItemDto(itemStorage.create(itemCreate, userId));
+        return itemMapper.toDto(itemStorage.create(itemCreate, userId));
     }
 
     @Override
     public ItemDto update(Long id, ItemDto itemDto, Long userId) {
         ValidationTool.checkId(id, PROGRAM_LEVEL, "вещь не может быть обновлена по id = null");
 
-        Item item1 = itemStorage.getItemById(id).orElseThrow(
+        Item existingItem = itemStorage.getItemById(id).orElseThrow(
                 () -> new NotFoundException("вещь с id = " + id + " не найдена")
         );
 
-        if (!item1.getOwner().equals(userId)) {
+        if (!existingItem.getOwner().equals(userId)) {
             throw new NotFoundException("id владельца не совпадает с передаваемым id");
         }
 
-        Item updateItem = Item.builder()
-            .id(id)
-            .name(itemDto.getName() != null ? itemDto.getName() : item1.getName())
-            .description(itemDto.getDescription() != null ? itemDto.getDescription() : item1.getDescription())
-            .available(itemDto.getAvailable() != null ? itemDto.getAvailable() : item1.getAvailable())
-            .owner(itemDto.getOwner() != null ? itemDto.getOwner() : item1.getOwner())
-            .request(itemDto.getRequest() != null ? itemDto.getRequest() : item1.getRequest())
-            .build();
+        itemMapper.updateItemFromDto(itemDto, existingItem);
+        existingItem.setId(id);
 
-        itemStorage.update(id, updateItem);
-        return ItemDtoMapper.toItemDto(updateItem);
+        itemStorage.update(id, existingItem);
+        return itemMapper.toDto(existingItem);
     }
 
     @Override
@@ -77,17 +70,14 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemStorage.getItemById(id).orElseThrow(
                 () -> new NotFoundException("вещь с id = " + id + " не найдена")
         );
-        return ItemDtoMapper.toItemDto(item);
+        return itemMapper.toDto(item);
     }
 
     @Override
     public List<ItemDto> getAllItemsByUser(Long userId) {
         ValidationTool.checkId(userId, PROGRAM_LEVEL, "вещи не могут быть найдена по id_user = null");
-        List<ItemDto> allItemDto = new ArrayList<>();
-        for (Item item : itemStorage.getAllItemsByUser(userId)) {
-            allItemDto.add(ItemDtoMapper.toItemDto(item));
-        }
-        return allItemDto;
+        List<Item> items = itemStorage.getAllItemsByUser(userId);
+        return itemMapper.toDtoList(items);
     }
 
     @Override
@@ -97,8 +87,7 @@ public class ItemServiceImpl implements ItemService {
         }
         log.info("Поиск вещей, имя или описание которых содержат: {}.", text);
 
-        return itemStorage.searchItem(text).stream()
-                .map(ItemDtoMapper::toItemDto)
-                .collect(Collectors.toUnmodifiableList());
+        List<Item> items = itemStorage.searchItem(text);
+        return itemMapper.toDtoList(items);
     }
 }

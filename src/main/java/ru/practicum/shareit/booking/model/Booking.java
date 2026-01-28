@@ -25,9 +25,9 @@ public class Booking {
     @PastOrPresent
     private LocalDateTime end;
     @NotNull
-    private Item item;
+    private Long item;
     @NotNull
-    private User booker;
+    private Long booker;
     @NotNull
     private String status;
 }

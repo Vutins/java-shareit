@@ -7,7 +7,7 @@ import ru.practicum.shareit.exception.InternalServerException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.mapper.UserDtoMapper;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserInMemoryStorage;
 import ru.practicum.shareit.validation.ValidationTool;
@@ -20,6 +20,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserInMemoryStorage userStorage;
+    private final UserMapper userMapper;
     private static final String PROGRAM_LEVEL = "UserService";
 
     @Override
@@ -30,8 +31,8 @@ public class UserServiceImpl implements UserService {
         findByEmail(user.getEmail()).ifPresent(existingUser -> {
             throw new InternalServerException("Пользователь с email " + user.getEmail() + " уже существует");
         });
-        User userCreate = UserDtoMapper.toUser(user);
-        return UserDtoMapper.toUserDto(userStorage.create(userCreate));
+        User userCreate = userMapper.toEntity(user);
+        return userMapper.toDto(userStorage.create(userCreate));
     }
 
     @Override
@@ -54,14 +55,11 @@ public class UserServiceImpl implements UserService {
             });
         }
 
-        User updatedUser = User.builder()
-                .id(id)
-                .name(userDto.getName() != null ? userDto.getName() : existingUser.getName())
-                .email(userDto.getEmail() != null ? userDto.getEmail() : existingUser.getEmail())
-                .build();
+        userMapper.updateUserFromDto(userDto, existingUser);
+        existingUser.setId(id);
 
-        userStorage.update(id, updatedUser);
-        return UserDtoMapper.toUserDto(updatedUser);
+        userStorage.update(id, existingUser);
+        return userMapper.toDto(existingUser);
     }
 
     @Override
@@ -73,7 +71,7 @@ public class UserServiceImpl implements UserService {
                 ));
 
         log.info("{}: Пользователь с ID {} найден", PROGRAM_LEVEL, id);
-        return UserDtoMapper.toUserDto(user);
+        return userMapper.toDto(user);
     }
 
     @Override
