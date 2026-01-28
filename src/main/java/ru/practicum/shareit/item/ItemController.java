@@ -41,7 +41,7 @@ public class ItemController {
     @GetMapping
     public ResponseEntity<List<ItemDto>> getAllItemsByUser(@Valid @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("запрос на получение вещей пользователя");
-        return ResponseEntity.ok( itemService.getAllItemsByUser(userId));
+        return ResponseEntity.ok(itemService.getAllItemsByUser(userId));
     }
 
     @GetMapping("/search")

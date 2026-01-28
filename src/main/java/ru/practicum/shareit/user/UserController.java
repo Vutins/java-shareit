@@ -24,7 +24,7 @@ public class UserController {
     @PatchMapping("/{id}")
     public ResponseEntity<UserDto> update(@PathVariable Long id, @Valid @RequestBody UserDto user) {
         log.info("запрос на обновление пользователя");
-        return ResponseEntity.ok( userService.update(id, user));
+        return ResponseEntity.ok(userService.update(id, user));
     }
 
     @GetMapping("/{id}")
