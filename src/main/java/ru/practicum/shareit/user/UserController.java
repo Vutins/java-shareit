@@ -3,7 +3,7 @@ package ru.practicum.shareit.user;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 
@@ -16,30 +16,27 @@ public class UserController {
     private final UserServiceImpl userService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
-    public UserDto create(@Valid @RequestBody UserDto user) {
+    public ResponseEntity<UserDto> create(@Valid @RequestBody UserDto user) {
         log.info("запрос на создание пользователя");
-        return userService.create(user);
+        return ResponseEntity.ok(userService.create(user));
     }
 
     @PatchMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public UserDto update(@PathVariable Long id, @Valid @RequestBody UserDto user) {
+    public ResponseEntity<UserDto> update(@PathVariable Long id, @Valid @RequestBody UserDto user) {
         log.info("запрос на обновление пользователя");
-        return userService.update(id, user);
+        return ResponseEntity.ok( userService.update(id, user));
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public UserDto getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         log.info("запрос на вывод пользователя по id");
-        return userService.getUserById(id);
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public void deleteUserById(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUserById(@PathVariable Long id) {
         log.info("запрос на удаление пользователя");
         userService.deleteUserById(id);
+        return ResponseEntity.ok().build();
     }
 }
