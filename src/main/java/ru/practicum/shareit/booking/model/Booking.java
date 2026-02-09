@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.booking.status.Status;
 
 import java.time.LocalDateTime;
 
@@ -37,6 +38,6 @@ public class Booking {
     @Column(name = "item_id")
     private Long item;
     @NotNull
-    @Column(name = "status_id")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 }
