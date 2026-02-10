@@ -50,10 +50,11 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- H2 для основной среды и тестов -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>test</scope>
+            <!-- УБРАТЬ scope или оставить runtime -->
         </dependency>
 
         <!-- Lombok -->

@@ -91,12 +91,12 @@ public class BookingServiceImpl implements BookingService {
         }
 
         userService.getUserById(userId);
-        Booking booking = repository.findById(userId)
+        Booking booking = repository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("бронирование с id = " + bookingId +" не найдено"));
 
         ItemDto item = itemService.getItemById(booking.getItem());
         Long ownerId = item.getOwner();
-        if (!booking.getBooker().equals(userId) || !ownerId.equals(userId)) {
+        if (!booking.getBooker().equals(userId) && !ownerId.equals(userId)) {
             throw new ValidationException("просматривать бронь может владелец вещи или автор бронирования");
         }
         return mapper.toDto(booking);
@@ -110,6 +110,7 @@ public class BookingServiceImpl implements BookingService {
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
         LocalDateTime now = LocalDateTime.now();
         List<BookingDto> bookings;
+
         switch (state.toUpperCase()) {
             case "CURRENT":
                 bookings = repository.findCurrentByBookerId(userId, now, pageable).stream()
@@ -129,12 +130,12 @@ public class BookingServiceImpl implements BookingService {
             case "WAITING":
             case "REJECTED":
                 Status status = Status.valueOf(state.toUpperCase());
-                bookings = repository.findByBookerIdAndStatusOrderByStartDesc(userId, status, pageable).stream()
+                bookings = repository.findByBookerAndStatusOrderByStartDesc(userId, status, pageable).stream()
                         .map(mapper::toDto)
                         .collect(Collectors.toList());
                 break;
             case "ALL":
-                bookings = repository.findByBookerIdOrderByStartDesc(userId, pageable).stream()
+                bookings = repository.findByBookerOrderByStartDesc(userId, pageable).stream()
                         .map(mapper::toDto)
                         .collect(Collectors.toList());
                 break;
@@ -173,7 +174,10 @@ public class BookingServiceImpl implements BookingService {
             case "WAITING":
             case "REJECTED":
                 Status status = Status.valueOf(state.toUpperCase());
-                bookings = repository.findByItemOwnerIdAndStatusOrderByStartDesc(ownerId, status, pageable).stream()
+                bookings = repository.findByItemOwnerIdAndStatusOrderByStartDesc(
+                                ownerId,
+                                status.toString(),
+                                pageable).stream()
                         .map(mapper::toDto)
                         .collect(Collectors.toList());
                 break;

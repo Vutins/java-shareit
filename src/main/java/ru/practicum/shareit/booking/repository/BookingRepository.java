@@ -13,111 +13,135 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    List<Booking> findByBookerIdOrderByStartDesc(Long bookerId, Pageable pageable);
+    List<Booking> findByBookerOrderByStartDesc(Long booker, Pageable pageable);
 
-    List<Booking> findByBookerIdAndStatusOrderByStartDesc(Long bookerId, Status status, Pageable pageable);
+    List<Booking> findByBookerAndStatusOrderByStartDesc(Long booker, Status status, Pageable pageable);
 
-    @Query("SELECT b FROM Booking b WHERE " +
-            "b.booker.id = :userId AND " +
-            "b.start <= :now AND " +
-            "b.end >= :now " +
-            "ORDER BY b.start DESC")
-    List<Booking> findCurrentByBookerId(@Param("userId") Long userId, @Param("now") LocalDateTime now, Pageable pageable);
+    @Query(value = "SELECT * FROM bookings WHERE booker_id = :userId " +
+            "AND start <= :now AND ended >= :now " +
+            "ORDER BY start DESC",
+            nativeQuery = true)
+    List<Booking> findCurrentByBookerId(@Param("userId") Long userId,
+                                        @Param("now") LocalDateTime now,
+                                        Pageable pageable);
 
-    @Query("SELECT b FROM Booking b WHERE " +
-            "b.booker.id = :userId AND " +
-            "b.end < :now " +
-            "ORDER BY b.start DESC")
-    List<Booking> findPastByBookerId(@Param("userId") Long userId, @Param("now") LocalDateTime now, Pageable pageable);
+    @Query(value = "SELECT * FROM bookings WHERE booker_id = :userId " +
+            "AND ended < :now " +
+            "ORDER BY start DESC",
+            nativeQuery = true)
+    List<Booking> findPastByBookerId(@Param("userId") Long userId,
+                                     @Param("now") LocalDateTime now,
+                                     Pageable pageable);
 
-    @Query("SELECT b FROM Booking b WHERE " +
-            "b.booker.id = :userId AND " +
-            "b.start > :now " +
-            "ORDER BY b.start DESC")
-    List<Booking> findFutureByBookerId(@Param("userId") Long userId, @Param("now") LocalDateTime now, Pageable pageable);
+    @Query(value = "SELECT * FROM bookings WHERE booker_id = :userId " +
+            "AND start > :now " +
+            "ORDER BY start DESC",
+            nativeQuery = true)
+    List<Booking> findFutureByBookerId(@Param("userId") Long userId,
+                                       @Param("now") LocalDateTime now,
+                                       Pageable pageable);
 
-    List<Booking> findByItemOwnerIdOrderByStartDesc(Long ownerId, Pageable pageable);
+    @Query(value = "SELECT b.* FROM bookings b " +
+            "JOIN items i ON b.item_id = i.id " +
+            "WHERE i.owner_id = :ownerId " +
+            "ORDER BY b.start DESC",
+            nativeQuery = true)
+    List<Booking> findByItemOwnerIdOrderByStartDesc(@Param("ownerId") Long ownerId, Pageable pageable);
 
-    List<Booking> findByItemOwnerIdAndStatusOrderByStartDesc(Long ownerId, Status status, Pageable pageable);
+    @Query(value = "SELECT b.* FROM bookings b " +
+            "JOIN items i ON b.item_id = i.id " +
+            "WHERE i.owner_id = :ownerId " +
+            "AND b.status = :status " +
+            "ORDER BY b.start DESC",
+            nativeQuery = true)
+    List<Booking> findByItemOwnerIdAndStatusOrderByStartDesc(@Param("ownerId") Long ownerId,
+                                                             @Param("status") String status,
+                                                             Pageable pageable);
 
-    @Query("SELECT b FROM Booking b WHERE " +
-            "b.item.owner.id = :ownerId AND " +
-            "b.start <= :now AND " +
-            "b.end >= :now " +
-            "ORDER BY b.start DESC")
-    List<Booking> findCurrentByOwnerId(@Param("ownerId") Long ownerId, @Param("now") LocalDateTime now, Pageable pageable);
+    @Query(value = "SELECT b.* FROM bookings b " +
+            "JOIN items i ON b.item_id = i.id " +
+            "WHERE i.owner_id = :ownerId " +
+            "AND b.start <= :now AND b.ended >= :now " +
+            "ORDER BY b.start DESC",
+            nativeQuery = true)
+    List<Booking> findCurrentByOwnerId(@Param("ownerId") Long ownerId,
+                                       @Param("now") LocalDateTime now,
+                                       Pageable pageable);
 
-    @Query("SELECT b FROM Booking b WHERE " +
-            "b.item.owner.id = :ownerId AND " +
-            "b.end < :now " +
-            "ORDER BY b.start DESC")
-    List<Booking> findPastByOwnerId(@Param("ownerId") Long ownerId, @Param("now") LocalDateTime now, Pageable pageable);
+    @Query(value = "SELECT b.* FROM bookings b " +
+            "JOIN items i ON b.item_id = i.id " +
+            "WHERE i.owner_id = :ownerId " +
+            "AND b.ended < :now " +
+            "ORDER BY b.start DESC",
+            nativeQuery = true)
+    List<Booking> findPastByOwnerId(@Param("ownerId") Long ownerId,
+                                    @Param("now") LocalDateTime now,
+                                    Pageable pageable);
 
-    @Query("SELECT b FROM Booking b WHERE " +
-            "b.item.owner.id = :ownerId AND " +
-            "b.start > :now " +
-            "ORDER BY b.start DESC")
-    List<Booking> findFutureByOwnerId(@Param("ownerId") Long ownerId, @Param("now") LocalDateTime now, Pageable pageable);
+    @Query(value = "SELECT b.* FROM bookings b " +
+            "JOIN items i ON b.item_id = i.id " +
+            "WHERE i.owner_id = :ownerId " +
+            "AND b.start > :now " +
+            "ORDER BY b.start DESC",
+            nativeQuery = true)
+    List<Booking> findFutureByOwnerId(@Param("ownerId") Long ownerId,
+                                      @Param("now") LocalDateTime now,
+                                      Pageable pageable);
 
-    @Query("SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END " +
-            "FROM Booking b WHERE " +
-            "b.item.id = :itemId AND " +
-            "b.status = 'APPROVED' AND " +
-            "(:start BETWEEN b.start AND b.end OR " +
-            ":end BETWEEN b.start AND b.end OR " +
-            "(b.start <= :start AND b.end >= :end))")
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
+            "FROM bookings WHERE item_id = :itemId " +
+            "AND status = 'APPROVED' " +
+            "AND (:start BETWEEN start AND ended OR " +
+            ":end BETWEEN start AND ended OR " +
+            "(start <= :start AND ended >= :end))",
+            nativeQuery = true)
     boolean existsApprovedBookingsForItemBetweenDates(
             @Param("itemId") Long itemId,
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end);
 
-    @Query("SELECT b FROM Booking b WHERE " +
-            "b.item.id = :itemId AND " +
-            "b.booker.id = :userId AND " +  // Добавьте это условие
-            "b.status = 'APPROVED' AND " +
-            "b.end < :now " +
-            "ORDER BY b.end DESC")
+    @Query(value = "SELECT * FROM bookings WHERE item_id = :itemId " +
+            "AND booker_id = :userId " +
+            "AND status = 'APPROVED' " +
+            "AND ended < :now " +
+            "ORDER BY ended DESC",
+            nativeQuery = true)
     List<Booking> findLastBookingForItem(
-            @Param("itemId") Long itemId,
-            @Param("userId") Long userId,  // Добавьте этот параметр
-            @Param("now") LocalDateTime now,
-            Pageable pageable);
-
-    @Query("SELECT b FROM Booking b WHERE " +
-            "b.item.id = :itemId AND " +
-            "b.booker.id = :userId AND " +
-            "b.end < :now " +  // Убрали проверку статуса
-            "ORDER BY b.end DESC")
-    List<Booking> findLastBookingForItemSimple(
             @Param("itemId") Long itemId,
             @Param("userId") Long userId,
             @Param("now") LocalDateTime now,
             Pageable pageable);
 
-    @Query("SELECT b FROM Booking b WHERE " +
-            "b.item.id = :itemId AND " +
-            "b.status = 'APPROVED' AND " +
-            "b.start > :now " +
-            "ORDER BY b.start ASC")
+    @Query(value = "SELECT * FROM bookings WHERE item_id = :itemId " +
+            "AND status = 'APPROVED' " +
+            "AND start > :now " +
+            "ORDER BY start ASC",
+            nativeQuery = true)
     List<Booking> findNextBookingForItem(
             @Param("itemId") Long itemId,
             @Param("now") LocalDateTime now,
             Pageable pageable);
 
-    @Query("SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END FROM Booking b WHERE b.booker.id = :bookerId AND b.item.id = :itemId AND b.end < :endDate")
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
+            "FROM bookings WHERE booker_id = :bookerId " +
+            "AND item_id = :itemId " +
+            "AND ended < :endDate",
+            nativeQuery = true)
     boolean existsByBookerIdAndItemIdAndEndIsBefore(
             @Param("bookerId") Long bookerId,
             @Param("itemId") Long itemId,
             @Param("endDate") LocalDateTime endDate);
 
     @Modifying
-    @Query("DELETE FROM Booking b WHERE b.booker.id = :userId")
+    @Query(value = "DELETE FROM bookings WHERE booker_id = :userId", nativeQuery = true)
     void deleteByBookerId(@Param("userId") Long userId);
 
-    @Query(value = "SELECT b.* FROM bookings as b " +
-            "JOIN items as i ON i.id = b.item_id " +
-            "WHERE b.booker_id = ?1 " +
-            "AND i.id = ?2 " +
-            "AND b.status = 'APPROVED' ", nativeQuery = true)
-    List<Booking> findAllByUserBookings(Long userId, Long itemId, LocalDateTime now);
+    @Query(value = "SELECT b.* FROM bookings b " +
+            "JOIN items i ON i.id = b.item_id " +
+            "WHERE b.booker_id = :userId " +
+            "AND i.id = :itemId " +
+            "AND b.status = 'APPROVED'",
+            nativeQuery = true)
+    List<Booking> findAllByUserBookings(@Param("userId") Long userId,
+                                        @Param("itemId") Long itemId);
 }
