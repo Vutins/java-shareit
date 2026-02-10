@@ -4,10 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Data
 @Entity
@@ -15,32 +13,33 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "items")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Item {
 
     @Id
     @JsonProperty("id")
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
     @NotBlank
     @NotNull
     @JsonProperty("name")
     @Column(name = "name")
-    private String name;
+    String name;
     @NotBlank
     @NotNull
     @JsonProperty("description")
     @Column(name = "description")
-    private String description;
+    String description;
     @NotNull
     @JsonProperty("available")
     @Column(name = "available")
-    private Boolean available;
+    Boolean available;
     @NotNull
     @JsonProperty("owner")
     @Column(name = "owner_id")
-    private Long owner;
+    Long owner;
     @JsonProperty("request")
     @Column(name = "request_id")
-    private Long request;
+    Long request;
 }

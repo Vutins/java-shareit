@@ -3,10 +3,8 @@ package ru.practicum.shareit.booking.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.booking.status.Status;
 
 import java.time.LocalDateTime;
@@ -17,27 +15,28 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "bookings")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Booking {
 
     @Id
     @NotNull
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
     @NotNull
     @PastOrPresent
     @Column(name = "start")
-    private LocalDateTime start;
+    LocalDateTime start;
     @PastOrPresent
     @Column(name = "ended")
-    private LocalDateTime end;
+    LocalDateTime end;
     @NotNull
     @Column(name = "booker_id")
-    private Long booker;
+    Long booker;
     @NotNull
     @Column(name = "item_id")
-    private Long item;
+    Long item;
     @NotNull
     @Enumerated(EnumType.STRING)
-    private Status status;
+    Status status;
 }

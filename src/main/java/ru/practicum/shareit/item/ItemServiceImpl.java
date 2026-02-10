@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.InternalServerException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -18,6 +19,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository repository;
@@ -26,6 +28,7 @@ public class ItemServiceImpl implements ItemService {
     private static final String PROGRAM_LEVEL = "ItemService";
 
     @Override
+    @Transactional
     public ItemDto create(ItemDto itemDto, Long userId) {
         Item itemCreate = itemMapper.toEntity(itemDto);
         itemCreate.setOwner(userId);
@@ -48,6 +51,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDto update(Long id, ItemDto itemDto, Long userId) {
         ValidationTool.checkId(id, PROGRAM_LEVEL, "вещь не может быть обновлена по id = null");
 

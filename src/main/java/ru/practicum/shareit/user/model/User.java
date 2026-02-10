@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Data
 @Entity
@@ -11,17 +12,18 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "users")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
 
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
     @Column(name = "name")
     @NotBlank(message = "имя не может быть пустым")
-    private String name;
+    String name;
     @Column(name = "email")
     @Email(message = "некорректный email")
     @NotBlank(message = "email не может быть пустым")
-    private String email;
+    String email;
 }

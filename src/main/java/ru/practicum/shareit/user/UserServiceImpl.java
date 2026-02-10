@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.InternalServerException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -16,6 +17,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
@@ -23,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private static final String PROGRAM_LEVEL = "UserService";
 
     @Override
+    @Transactional
     public UserDto create(UserDto user) {
         if (user.getEmail() == null) {
             throw new InternalServerException("для создания пользователя укажите email");
@@ -35,6 +38,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto update(Long id, UserDto userDto) {
         ValidationTool.checkId(id, PROGRAM_LEVEL, "User не может быть обновлен по id = null");
 
@@ -74,13 +78,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUserById(Long id) {
         if (!repository.existsById(id)) {
             throw new NotFoundException("пользователя с id = " + id + "не найден");
         }
         repository.deleteById(id);
     }
-
 
     private Optional<User> findByEmail(String email) {
         return repository.findByEmail(email);
