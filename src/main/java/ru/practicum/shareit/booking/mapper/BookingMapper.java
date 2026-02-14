@@ -9,15 +9,15 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring")
 public interface BookingMapper {
 
     @Mapping(target = "booker", ignore = true)
     @Mapping(target = "item", ignore = true)
     BookingDto toDto(Booking booking);
 
-    @Mapping(target = "booker", source = "booker", qualifiedByName = "userDtoToLong")
-    @Mapping(target = "item", source = "item", qualifiedByName = "itemDtoToLong")
+    @Mapping(target = "booker", source = "booker")
+    @Mapping(target = "item", source = "item")
     Booking toEntity(BookingDto bookingDto);
 
     @Mapping(target = "id", ignore = true)
@@ -29,13 +29,9 @@ public interface BookingMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateBookingFromDto(BookingDto bookingDto, @MappingTarget Booking booking);
-
-    @Named("userDtoToLong")
     default Long mapUserDtoToLong(UserDto userDto) {
         return userDto != null ? userDto.getId() : null;
     }
-
-    @Named("itemDtoToLong")
     default Long mapItemDtoToLong(ItemDto itemDto) {
         return itemDto != null ? itemDto.getId() : null;
     }
