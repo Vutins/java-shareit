@@ -22,7 +22,7 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    Long id; 
+    Long id;
 
     @NotNull
     @FutureOrPresent(message = "Дата начала должна быть в настоящем или будущем")
