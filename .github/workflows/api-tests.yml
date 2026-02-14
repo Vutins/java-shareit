@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,15 +16,52 @@ jobs:
           java-version: '21'
           distribution: 'corretto'
 
-      - name: Build application
+      - name: Build with Maven
         run: mvn clean compile
 
-      - name: Start application
+      - name: Start application in background
         run: |
-          mvn spring-boot:run &
+          mvn spring-boot:run > app.log 2>&1 &
+          echo $! > app.pid
+          echo "Waiting for application to start..."
           sleep 30
 
-      - name: Run API tests
+      - name: Check if application is running
         run: |
-          chmod a+x ./tests/.github/workflows/build.sh
-          ./tests/.github/workflows/build.sh
+          if curl -s http://localhost:8080 > /dev/null; then
+            echo "✅ Application started successfully"
+          else
+            echo "❌ Application failed to start"
+            cat app.log
+            exit 1
+          fi
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Postman tests
+        run: |
+          newman run ./tests/postman/sprint.json \
+            --delay-request 50 \
+            -r cli,htmlextra \
+            --verbose \
+            --color on \
+            --reporter-htmlextra-darkTheme \
+            --reporter-htmlextra-export reports/shareIt.html \
+            --reporter-htmlextra-title "Отчет по тестам" \
+            --reporter-htmlextra-logs true || true
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-reports
+          path: reports/
+
+      - name: Show application logs
+        if: always()
+        run: cat app.log || true
+
+      - name: Stop application
+        if: always()
+        run: kill `cat app.pid` || true
