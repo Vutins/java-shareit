@@ -67,14 +67,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Long id) {
-        ValidationTool.checkId(id, PROGRAM_LEVEL, "Id не может равняться null");
-        User user = repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("Пользователь с ID %d не найден", id)
-                ));
-
-        log.info("{}: Пользователь с ID {} найден", PROGRAM_LEVEL, id);
-        return userMapper.toDto(user);
+//        ValidationTool.checkId(id, PROGRAM_LEVEL, "Id не может равняться null");
+        try {
+            User user = repository.findById(id)
+                    .orElseThrow(() -> {
+                        log.warn("Пользователь с ID {} не найден в БД", id);
+                        return new NotFoundException(
+                                String.format("Пользователь с ID %d не найден", id)
+                        );
+                    });
+            log.info("{}: Пользователь с ID {} найден", PROGRAM_LEVEL, id);
+            return userMapper.toDto(user);
+        } catch (NotFoundException e) {
+            log.warn("NotFoundException из UserServiceImpl: {}", e.getMessage());
+            throw e;
+        }
     }
 
     @Override

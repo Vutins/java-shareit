@@ -6,6 +6,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.item.comment.model.Comment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -42,4 +46,7 @@ public class Item {
     @JsonProperty("request")
     @Column(name = "request_id")
     Long request;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private List<Comment> comments = new ArrayList<>();
 }
