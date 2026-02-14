@@ -29,9 +29,11 @@ public interface BookingMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateBookingFromDto(BookingDto bookingDto, @MappingTarget Booking booking);
+
     default Long mapUserDtoToLong(UserDto userDto) {
         return userDto != null ? userDto.getId() : null;
     }
+
     default Long mapItemDtoToLong(ItemDto itemDto) {
         return itemDto != null ? itemDto.getId() : null;
     }
