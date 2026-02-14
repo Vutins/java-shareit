@@ -22,18 +22,22 @@ public class Comment {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     @NotNull
     @NotBlank
     @Column(name = "text")
     String text;
+
     @NotNull
     @Positive
     @Column(name = "item_id")
     Long itemId;
+
     @NotNull
     @Positive
     @Column(name = "author_id")
     Long authorId;
+
     @Column(name = "created")
     Instant created;
 }

@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.mapper;
 
 import org.mapstruct.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
@@ -13,14 +12,12 @@ import java.util.List;
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ItemMapper {
 
-    // Базовый маппинг Item -> ItemDto
     @Mapping(target = "request", source = "request")
     @Mapping(target = "comments", ignore = true)
     @Mapping(target = "lastBooking", ignore = true)
     @Mapping(target = "nextBooking", ignore = true)
     ItemDto toDto(Item item);
 
-    // Базовый маппинг ItemDto -> Item
     @Mapping(target = "comments", ignore = true)
     @Mapping(target = "request", source = "request")
     Item toEntity(ItemDto itemDto);

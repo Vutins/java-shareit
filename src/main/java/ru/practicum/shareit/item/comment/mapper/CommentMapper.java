@@ -6,7 +6,6 @@ import org.mapstruct.Named;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.comment.dto.RequestCommentDto;
 import ru.practicum.shareit.item.comment.model.Comment;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;

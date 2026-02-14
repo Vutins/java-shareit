@@ -180,7 +180,7 @@ public class ItemServiceImpl implements ItemService {
         return items.stream()
                 .map(item -> {
                     ItemDto dto = itemMapper.toDto(item);
-                    dto.setComments(getCommentsForItem(item.getId())); // Добавляем комментарии
+                    dto.setComments(getCommentsForItem(item.getId()));
                     return dto;
                 })
                 .collect(Collectors.toList());

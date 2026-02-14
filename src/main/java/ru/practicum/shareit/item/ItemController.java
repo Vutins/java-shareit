@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemController {
 
-    private final ItemService itemService;  // Используем интерфейс, а не реализацию
+    private final ItemService itemService;
 
     @PostMapping
     public ResponseEntity<ItemDto> create(@Valid @RequestBody ItemDto itemDto,
@@ -43,7 +43,7 @@ public class ItemController {
     public ResponseEntity<ItemDto> getItemById(@PathVariable Long id,
                                                @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("запрос на вывод вещи {} от пользователя {}", id, userId);
-        ItemDto item = itemService.getItemByIdWithDetails(id, userId);  // Новый метод
+        ItemDto item = itemService.getItemByIdWithDetails(id, userId);
         return ResponseEntity.ok(item);
     }
 
@@ -58,7 +58,7 @@ public class ItemController {
     public ResponseEntity<List<ItemDto>> searchItem(@RequestParam String text,
                                                     @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("запрос на поиск вещей по тексту '{}' от пользователя {}", text, userId);
-        List<ItemDto> items = itemService.searchItem(text, userId);  // Добавили userId
+        List<ItemDto> items = itemService.searchItem(text, userId);
         return ResponseEntity.ok(items);
     }
 

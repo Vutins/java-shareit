@@ -67,7 +67,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Long id) {
-//        ValidationTool.checkId(id, PROGRAM_LEVEL, "Id не может равняться null");
         try {
             User user = repository.findById(id)
                     .orElseThrow(() -> {
