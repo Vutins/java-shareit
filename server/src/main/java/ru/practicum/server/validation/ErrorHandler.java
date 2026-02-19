@@ -1,4 +1,4 @@
-package ru.practicum.shareit.validation;
+package ru.practicum.server.validation;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.practicum.shareit.exception.InternalServerException;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.dto.exception.InternalServerException;
+import ru.practicum.dto.exception.NotFoundException;
+import ru.practicum.dto.exception.ValidationException;
 
 @RestControllerAdvice
 public class ErrorHandler {
