@@ -1,12 +1,13 @@
-package ru.practicum.shareit.item.comment.mapper;
+package ru.practicum.server.item.comment.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import ru.practicum.shareit.item.comment.dto.CommentDto;
-import ru.practicum.shareit.item.comment.dto.RequestCommentDto;
-import ru.practicum.shareit.item.comment.model.Comment;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.dto.comment.CommentDto;
+import ru.practicum.dto.comment.RequestCommentDto;
+import ru.practicum.server.item.comment.model.Comment;
+import ru.practicum.server.user.repository.UserRepository;
+
 
 import java.util.List;
 
