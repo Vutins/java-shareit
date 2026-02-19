@@ -1,22 +1,18 @@
 package ru.practicum.gateway.client.user;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.user.UserDto;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping(path = "/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserClient userClient;
-
-    public UserController(UserClient userClient) {
-        this.userClient = userClient;
-    }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -32,15 +28,15 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> create(@RequestBody @Valid UserDto user) {
+    public ResponseEntity<Object> create(@RequestBody UserDto user) {
         return userClient.create(user);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> update(@PathVariable Long id,
-                                         @RequestBody @Valid Map<String, Object> updates) {
-        return userClient.update(id, updates);
+                                         @RequestBody UserDto user) {
+        return userClient.update(id, user);
     }
 
     @DeleteMapping("/{id}")

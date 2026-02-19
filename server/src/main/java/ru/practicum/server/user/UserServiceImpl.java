@@ -2,6 +2,7 @@ package ru.practicum.server.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.exception.InternalServerException;
@@ -10,9 +11,6 @@ import ru.practicum.dto.user.UserDto;
 import ru.practicum.server.user.mapper.UserMapper;
 import ru.practicum.server.user.model.User;
 import ru.practicum.server.user.repository.UserRepository;
-import ru.practicum.server.validation.ValidationTool;
-
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -26,73 +24,89 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDto create(UserDto user) {
-        if (user.getEmail() == null) {
-            throw new InternalServerException("для создания пользователя укажите email");
+    public UserDto create(UserDto userDto) {
+        log.info("Создание пользователя с email: {}", userDto.getEmail());
+
+        if (repository.findByEmail(userDto.getEmail()).isPresent()) {
+            log.warn("Пользователь с email {} уже существует", userDto.getEmail());
+            throw new InternalServerException("Пользователь с email " + userDto.getEmail() + " уже существует");
         }
-        findByEmail(user.getEmail()).ifPresent(existingUser -> {
-            throw new InternalServerException("Пользователь с email " + user.getEmail() + " уже существует");
-        });
-        User userCreate = userMapper.toEntity(user);
-        return userMapper.toDto(repository.save(userCreate));
+
+        User user = userMapper.toEntity(userDto);
+
+        try {
+            User savedUser = repository.save(user);
+            log.info("Пользователь создан с id: {}", savedUser.getId());
+            return userMapper.toDto(savedUser);
+        } catch (DataIntegrityViolationException e) {
+            log.error("Ошибка при сохранении пользователя: {}", e.getMessage());
+            throw new InternalServerException("Пользователь с таким email уже существует");
+        }
     }
 
     @Override
     @Transactional
     public UserDto update(Long id, UserDto userDto) {
-        ValidationTool.checkId(id, PROGRAM_LEVEL, "User не может быть обновлен по id = null");
+        log.info("Обновление пользователя с id: {}", id);
+
+        if (userDto.getId() != null && !userDto.getId().equals(id)) {
+            log.warn("ID в теле запроса {} не совпадает с ID в пути {}", userDto.getId(), id);
+            throw new InternalServerException("ID в теле запроса не совпадает с ID в URL");
+        }
 
         User existingUser = repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("Пользователь с ID %d не найден", id)
-                ));
-        ValidationTool.userCheck(existingUser, PROGRAM_LEVEL);
+                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + id + " не найден"));
 
-        String newEmail = userDto.getEmail() != null ? userDto.getEmail() : existingUser.getEmail();
+        log.debug("Существующий пользователь: {}", existingUser);
 
-        if (userDto.getEmail() != null && !existingUser.getEmail().equals(newEmail)) {
-            repository.findByEmail(newEmail).ifPresent(otherUser -> {
-                if (!otherUser.getId().equals(id)) {
-                    throw new InternalServerException("Email " + newEmail + " уже используется другим пользователем");
+        if (userDto.getEmail() != null && !userDto.getEmail().equals(existingUser.getEmail())) {
+            log.debug("Проверка уникальности email: {}", userDto.getEmail());
+            repository.findByEmail(userDto.getEmail()).ifPresent(user -> {
+                if (!user.getId().equals(id)) {
+                    log.warn("Email {} уже используется пользователем с id {}", userDto.getEmail(), user.getId());
+                    throw new InternalServerException("Email " + userDto.getEmail() + " уже используется другим пользователем");
                 }
             });
         }
 
-        userMapper.updateUserFromDto(userDto, existingUser);
-        existingUser.setId(id);
+        if (userDto.getName() != null) {
+            existingUser.setName(userDto.getName());
+        }
+        if (userDto.getEmail() != null) {
+            existingUser.setEmail(userDto.getEmail());
+        }
 
-        repository.save(existingUser);
-        return userMapper.toDto(existingUser);
+        log.debug("Обновленный пользователь перед сохранением: {}", existingUser);
+
+        try {
+            User updatedUser = repository.save(existingUser);
+            log.info("Пользователь с id {} успешно обновлен", id);
+            return userMapper.toDto(updatedUser);
+        } catch (DataIntegrityViolationException e) {
+            log.error("Ошибка целостности данных при обновлении пользователя: {}", e.getMessage());
+            throw new InternalServerException("Email уже существует");
+        } catch (Exception e) {
+            log.error("Неожиданная ошибка при обновлении пользователя: {}", e.getMessage(), e);
+            throw new InternalServerException("Ошибка при обновлении пользователя: " + e.getMessage());
+        }
     }
 
     @Override
     public UserDto getUserById(Long id) {
-        try {
-            User user = repository.findById(id)
-                    .orElseThrow(() -> {
-                        log.warn("Пользователь с ID {} не найден в БД", id);
-                        return new NotFoundException(
-                                String.format("Пользователь с ID %d не найден", id)
-                        );
-                    });
-            log.info("{}: Пользователь с ID {} найден", PROGRAM_LEVEL, id);
-            return userMapper.toDto(user);
-        } catch (NotFoundException e) {
-            log.warn("NotFoundException из UserServiceImpl: {}", e.getMessage());
-            throw e;
-        }
+        log.info("Получение пользователя с id: {}", id);
+        User user = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + id + " не найден"));
+        return userMapper.toDto(user);
     }
 
     @Override
     @Transactional
     public void deleteUserById(Long id) {
+        log.info("Удаление пользователя с id: {}", id);
         if (!repository.existsById(id)) {
-            throw new NotFoundException("пользователя с id = " + id + "не найден");
+            throw new NotFoundException("Пользователь с ID " + id + " не найден");
         }
         repository.deleteById(id);
-    }
-
-    private Optional<User> findByEmail(String email) {
-        return repository.findByEmail(email);
+        log.info("Пользователь с id {} удален", id);
     }
 }

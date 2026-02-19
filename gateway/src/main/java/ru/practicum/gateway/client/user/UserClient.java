@@ -4,14 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.gateway.base.BaseClient;
-
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -24,16 +22,14 @@ public class UserClient extends BaseClient {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))
-                        .requestFactory(() -> new HttpComponentsClientHttpRequestFactory())
+                        .requestFactory(() -> new HttpComponentsClientHttpRequestFactory()) // Возвращаем HttpComponents
                         .build()
         );
     }
 
     public ResponseEntity<Object> getUserList() {
         log.info("Отправка запроса на получение списка всех пользователей");
-        ResponseEntity<Object> response = get("");
-        log.info("Получен список пользователей");
-        return response;
+        return get("");
     }
 
     public ResponseEntity<Object> getUserDto(Long id) {
@@ -46,9 +42,9 @@ public class UserClient extends BaseClient {
         return post("", userDto);
     }
 
-    public ResponseEntity<Object> update(Long userId, Map<String, Object> updates) {
-        log.info("Отправка запроса на обновление пользователя с ID={}, данные: {}", userId, updates);
-        return patch("/" + userId, updates);
+    public ResponseEntity<Object> update(Long userId, UserDto userDto) {
+        log.info("Отправка запроса на обновление пользователя с ID={}, данные: {}", userId, userDto);
+        return patch("/" + userId, userDto);
     }
 
     public ResponseEntity<Object> delete(Long id) {
