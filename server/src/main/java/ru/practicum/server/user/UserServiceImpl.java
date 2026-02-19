@@ -1,16 +1,16 @@
-package ru.practicum.shareit.user;
+package ru.practicum.server.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exception.InternalServerException;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.validation.ValidationTool;
+import ru.practicum.dto.exception.InternalServerException;
+import ru.practicum.dto.exception.NotFoundException;
+import ru.practicum.dto.user.UserDto;
+import ru.practicum.server.user.mapper.UserMapper;
+import ru.practicum.server.user.model.User;
+import ru.practicum.server.user.repository.UserRepository;
+import ru.practicum.server.validation.ValidationTool;
 
 import java.util.Optional;
 
