@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.server.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,19 +7,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.RequestBookingDto;
-import ru.practicum.shareit.booking.mapper.BookingMapper;
-import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.booking.status.Status;
-import ru.practicum.shareit.exception.InternalServerException;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.ItemService;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.UserService;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.dto.booking.BookingDto;
+import ru.practicum.dto.booking.RequestBookingDto;
+import ru.practicum.dto.exception.InternalServerException;
+import ru.practicum.dto.exception.NotFoundException;
+import ru.practicum.dto.exception.ValidationException;
+import ru.practicum.dto.item.ItemDto;
+import ru.practicum.dto.user.UserDto;
+import ru.practicum.server.booking.mapper.BookingMapper;
+import ru.practicum.server.booking.model.Booking;
+import ru.practicum.server.booking.repository.BookingRepository;
+import ru.practicum.dto.booking.status.Status;
+import ru.practicum.server.item.ItemService;
+import ru.practicum.server.user.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;

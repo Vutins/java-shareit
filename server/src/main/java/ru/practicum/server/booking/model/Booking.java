@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.model;
+package ru.practicum.server.booking.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.booking.status.Status;
+import ru.practicum.dto.booking.status.Status;
 
 import java.time.LocalDateTime;
 

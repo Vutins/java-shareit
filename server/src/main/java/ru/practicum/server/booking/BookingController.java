@@ -1,12 +1,12 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.server.booking;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.RequestBookingDto;
+import ru.practicum.dto.booking.BookingDto;
+import ru.practicum.dto.booking.RequestBookingDto;
 
 import java.util.List;
 
