@@ -1,4 +1,4 @@
-package ru.practicum.shareit.request.model;
+package ru.practicum.server.request.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
