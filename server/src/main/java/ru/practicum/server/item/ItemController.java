@@ -23,7 +23,14 @@ public class ItemController {
     @PostMapping
     public ResponseEntity<ItemDto> create(@Valid @RequestBody ItemDto itemDto,
                                           @RequestHeader("X-Sharer-User-Id") Long userId) {
-        log.info("запрос на создание вещи от пользователя {}", userId);
+        log.info("=== СОЗДАНИЕ ВЕЩИ ===");
+        log.info("UserId: {}", userId);
+        log.info("Полученный ItemDto: {}", itemDto);
+        log.info("Поле name: {}", itemDto.getName());
+        log.info("Поле description: {}", itemDto.getDescription());
+        log.info("Поле available: {}", itemDto.getAvailable());
+        log.info("Поле request (маппится из requestId): {}", itemDto.getRequest());
+
         ItemDto createdItem = itemService.create(itemDto, userId);
         return ResponseEntity
                 .created(URI.create("/items/" + createdItem.getId()))

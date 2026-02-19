@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 public class ItemRequest {
 
     @Id
-    @NotNull
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
