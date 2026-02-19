@@ -1,13 +1,13 @@
-package ru.practicum.shareit.item;
+package ru.practicum.server.item;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.comment.dto.CommentDto;
-import ru.practicum.shareit.item.comment.dto.RequestCommentDto;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.dto.comment.CommentDto;
+import ru.practicum.dto.comment.RequestCommentDto;
+import ru.practicum.dto.item.ItemDto;
 
 import java.net.URI;
 import java.util.List;

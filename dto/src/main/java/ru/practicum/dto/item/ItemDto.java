@@ -1,11 +1,11 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.dto.item;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.item.comment.dto.CommentDto;
+import ru.practicum.dto.booking.BookingDto;
+import ru.practicum.dto.comment.CommentDto;
 
 import java.util.List;
 

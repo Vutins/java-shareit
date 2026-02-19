@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.server.item.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.item.comment.model.Comment;
+import ru.practicum.server.item.comment.model.Comment;
 
 import java.util.ArrayList;
 import java.util.List;

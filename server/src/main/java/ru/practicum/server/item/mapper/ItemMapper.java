@@ -1,10 +1,10 @@
-package ru.practicum.shareit.item.mapper;
+package ru.practicum.server.item.mapper;
 
 import org.mapstruct.*;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.item.comment.dto.CommentDto;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.dto.booking.BookingDto;
+import ru.practicum.dto.comment.CommentDto;
+import ru.practicum.dto.item.ItemDto;
+import ru.practicum.server.item.model.Item;
 
 import java.util.List;
 

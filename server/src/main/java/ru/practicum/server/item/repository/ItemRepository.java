@@ -1,9 +1,9 @@
-package ru.practicum.shareit.item.repository;
+package ru.practicum.server.item.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.server.item.model.Item;
 
 import java.util.List;
 
@@ -16,4 +16,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "OR UPPER(i.description) LIKE UPPER(CONCAT('%', :text, '%'))) " +
             "AND i.available = true")
     List<Item> searchItem(@Param("text") String text);
+
+    @Query("SELECT i FROM Item i WHERE i.request = :requestId")
+    List<Item> findByRequestId(@Param("requestId") Long requestId);
 }
