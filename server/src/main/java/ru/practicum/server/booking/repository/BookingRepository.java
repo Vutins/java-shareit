@@ -125,12 +125,21 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
             "FROM bookings WHERE booker_id = :bookerId " +
             "AND item_id = :itemId " +
-            "AND ended < :endDate",
+            "AND ended < :endDate " +
+            "AND status = 'APPROVED'",
             nativeQuery = true)
     boolean existsByBookerIdAndItemIdAndEndIsBefore(
             @Param("bookerId") Long bookerId,
             @Param("itemId") Long itemId,
             @Param("endDate") LocalDateTime endDate);
+
+    @Query(value = "SELECT * FROM bookings WHERE booker_id = :bookerId " +
+            "AND item_id = :itemId " +
+            "ORDER BY ended DESC",
+            nativeQuery = true)
+    List<Booking> findAllByBookerIdAndItemId(
+            @Param("bookerId") Long bookerId,
+            @Param("itemId") Long itemId);
 
     @Modifying
     @Query(value = "DELETE FROM bookings WHERE booker_id = :userId", nativeQuery = true)
