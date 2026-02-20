@@ -207,6 +207,9 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException("Вещь с ID " + itemId + " не найдена"));
         log.info("Вещь найдена: {} (ID={})", item.getName(), item.getId());
 
+        LocalDateTime now = LocalDateTime.now();
+        log.info("Текущее время: {}", now);
+
         List<Booking> approvedBookings = bookingRepository.findByBookerAndItemAndStatus(
                 userId, itemId, Status.APPROVED);
 
@@ -214,26 +217,53 @@ public class ItemServiceImpl implements ItemService {
 
         if (approvedBookings.isEmpty()) {
             log.error("❌ У пользователя {} нет APPROVED бронирований для вещи {}", userId, itemId);
-            throw new ValidationException("Вы можете комментировать только вещи, которые арендовали");
+            throw new ValidationException("Вы можете комментировать только после подтверждённого бронирования");
         }
 
-        log.info("✅ Есть APPROVED бронирование - создаём комментарий (тестовый режим)");
+        boolean hasPastBooking = false;
+        boolean hasActiveBooking = false;
 
-        Comment comment = Comment.builder()
-                .text(requestCommentDto.getText())
-                .itemId(itemId)
-                .authorId(userId)
-                .created(Instant.now())
-                .build();
+        for (Booking booking : approvedBookings) {
+            boolean isPast = booking.getEnd().isBefore(now);
+            log.info("Бронирование: ID={}, статус={}, start={}, end={}, PAST? {}",
+                    booking.getId(), booking.getStatus(), booking.getStart(), booking.getEnd(),
+                    isPast);
 
-        Comment savedComment = commentRepository.save(comment);
-        log.info("✅ Комментарий сохранён с ID: {}", savedComment.getId());
+            if (isPast) {
+                hasPastBooking = true;
+                log.info("✅ Найдено PAST (завершённое) бронирование с ID={}", booking.getId());
+            } else {
+                hasActiveBooking = true;
+                log.info("⏳ Найдено ACTIVE (активное) бронирование с ID={}", booking.getId());
+            }
+        }
 
-        CommentDto savedCommentDto = commentMapper.toDto(savedComment);
-        savedCommentDto.setAuthorName(author.getName());
+        if (hasPastBooking) {
+            log.info("✅ Есть завершённое бронирование - создаём комментарий");
 
-        log.info("✅ Добавлен комментарий: {}", savedCommentDto);
-        return savedCommentDto;
+            Comment comment = Comment.builder()
+                    .text(requestCommentDto.getText())
+                    .itemId(itemId)
+                    .authorId(userId)
+                    .created(Instant.now())
+                    .build();
+
+            Comment savedComment = commentRepository.save(comment);
+            log.info("✅ Комментарий сохранён с ID: {}", savedComment.getId());
+
+            CommentDto savedCommentDto = commentMapper.toDto(savedComment);
+            savedCommentDto.setAuthorName(author.getName());
+
+            log.info("✅ Добавлен комментарий: {}", savedCommentDto);
+            return savedCommentDto;
+        }
+
+        if (hasActiveBooking && !hasPastBooking) {
+            log.error("❌ У пользователя {} есть только активные APPROVED бронирования для вещи {}", userId, itemId);
+            throw new ValidationException("Нельзя оставить комментарий до завершения аренды");
+        }
+
+        throw new ValidationException("Нет подходящих бронирований");
     }
 
     private List<CommentDto> getCommentsForItem(Long itemId) {
