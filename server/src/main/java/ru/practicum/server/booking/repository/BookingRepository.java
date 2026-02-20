@@ -153,4 +153,16 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             nativeQuery = true)
     List<Booking> findAllByUserBookings(@Param("userId") Long userId,
                                         @Param("itemId") Long itemId);
+
+    @Query(value = "SELECT * FROM bookings WHERE booker_id = :userId " +
+            "AND item_id = :itemId " +
+            "AND status = 'APPROVED' " +
+            "AND ended < :now",
+            nativeQuery = true)
+    List<Booking> findCompletedBookingsForUserAndItem(
+            @Param("userId") Long userId,
+            @Param("itemId") Long itemId,
+            @Param("now") LocalDateTime now);
+
+    List<Booking> findByBookerAndItemAndStatus(Long bookerId, Long itemId, Status status);
 }

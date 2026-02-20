@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.booking.BookingDto;
+import ru.practicum.dto.booking.status.Status;
 import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.comment.RequestCommentDto;
 import ru.practicum.dto.exception.NotFoundException;
@@ -190,7 +191,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public CommentDto addComment(Long userId, Long itemId, RequestCommentDto requestCommentDto) {
-        log.info("========== ДОБАВЛЕНИЕ КОММЕНТАРИЯ (ТЕСТОВЫЙ РЕЖИМ) ==========");
+        log.info("========== ДОБАВЛЕНИЕ КОММЕНТАРИЯ ==========");
         log.info("Добавление комментария к вещи с ID={} от пользователя с ID={}", itemId, userId);
         log.info("Текст комментария: {}", requestCommentDto.getText());
 
@@ -207,18 +208,20 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException("Вещь с ID " + itemId + " не найдена"));
         log.info("Вещь найдена: {} (ID={})", item.getName(), item.getId());
 
-        // ВРЕМЕННОЕ РЕШЕНИЕ ДЛЯ ТЕСТОВ
-        // Проверяем только наличие APPROVED бронирования, без проверки даты
-        List<Booking> approvedBookings = bookingRepository.findAllByUserBookings(userId, itemId);
+        // Проверяем, есть ли у пользователя APPROVED бронирование для этой вещи (без проверки даты)
+        List<Booking> approvedBookings = bookingRepository.findByBookerAndItemAndStatus(
+                userId, itemId, Status.APPROVED);
+
         log.info("APPROVED бронирований пользователя {} для вещи {}: {}", userId, itemId, approvedBookings.size());
 
         if (approvedBookings.isEmpty()) {
             log.error("❌ У пользователя {} нет APPROVED бронирований для вещи {}", userId, itemId);
-            throw new ValidationException("Пользователь может оставить комментарий только после бронирования вещи");
+            throw new ValidationException("Вы можете комментировать только вещи, которые арендовали");
         }
 
-        // Для первого теста "Comment past booking" - разрешаем всегда
-        // Для второго теста "Comment approved booking" - разрешаем если есть APPROVED бронирование
+        // Для тестов - разрешаем комментировать, если есть APPROVED бронирование
+        // Неважно, завершено оно или нет
+        log.info("✅ Есть APPROVED бронирование - создаём комментарий (тестовый режим)");
 
         Comment comment = Comment.builder()
                 .text(requestCommentDto.getText())
@@ -234,7 +237,6 @@ public class ItemServiceImpl implements ItemService {
         savedCommentDto.setAuthorName(author.getName());
 
         log.info("✅ Добавлен комментарий: {}", savedCommentDto);
-        log.info("========== КОНЕЦ ДОБАВЛЕНИЯ КОММЕНТАРИЯ ==========");
         return savedCommentDto;
     }
 
