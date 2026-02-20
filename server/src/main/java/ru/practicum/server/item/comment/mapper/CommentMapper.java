@@ -8,7 +8,6 @@ import ru.practicum.dto.comment.RequestCommentDto;
 import ru.practicum.server.item.comment.model.Comment;
 import ru.practicum.server.user.repository.UserRepository;
 
-
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {UserRepository.class})

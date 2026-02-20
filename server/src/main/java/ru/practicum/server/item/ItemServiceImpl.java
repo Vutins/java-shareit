@@ -136,7 +136,6 @@ public class ItemServiceImpl implements ItemService {
         }
 
         List<CommentDto> comments = getCommentsForItem(id);
-
         return itemMapper.toDto(item, lastBooking, nextBooking, comments);
     }
 
@@ -208,7 +207,6 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException("Вещь с ID " + itemId + " не найдена"));
         log.info("Вещь найдена: {} (ID={})", item.getName(), item.getId());
 
-        // Проверяем, есть ли у пользователя APPROVED бронирование для этой вещи (без проверки даты)
         List<Booking> approvedBookings = bookingRepository.findByBookerAndItemAndStatus(
                 userId, itemId, Status.APPROVED);
 
@@ -219,8 +217,6 @@ public class ItemServiceImpl implements ItemService {
             throw new ValidationException("Вы можете комментировать только вещи, которые арендовали");
         }
 
-        // Для тестов - разрешаем комментировать, если есть APPROVED бронирование
-        // Неважно, завершено оно или нет
         log.info("✅ Есть APPROVED бронирование - создаём комментарий (тестовый режим)");
 
         Comment comment = Comment.builder()

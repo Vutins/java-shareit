@@ -1,6 +1,5 @@
 package ru.practicum.server.user;
 
-
 import ru.practicum.dto.user.UserDto;
 
 public interface UserService {

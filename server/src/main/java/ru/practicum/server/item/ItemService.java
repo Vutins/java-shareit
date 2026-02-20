@@ -1,7 +1,5 @@
 package ru.practicum.server.item;
 
-
-
 import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.comment.RequestCommentDto;
 import ru.practicum.dto.item.ItemDto;

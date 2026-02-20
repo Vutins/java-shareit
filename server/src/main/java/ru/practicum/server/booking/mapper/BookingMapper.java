@@ -8,7 +8,6 @@ import ru.practicum.dto.item.ItemDto;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.server.booking.model.Booking;
 
-
 import java.util.List;
 
 @Mapper(componentModel = "spring")

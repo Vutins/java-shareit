@@ -1,7 +1,5 @@
 package ru.practicum.server.booking;
 
-
-
 import ru.practicum.dto.booking.BookingDto;
 import ru.practicum.dto.booking.RequestBookingDto;
 

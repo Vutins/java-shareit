@@ -129,7 +129,6 @@ public class BookingServiceImpl implements BookingService {
             log.warn("Пользователь {} попытался получить чужое бронирование {}", userId, bookingId);
             throw new ValidationException("Просматривать бронирование может только автор или владелец вещи");
         }
-
         BookingDto bookingDto = mapper.toDto(booking);
         bookingDto.setBooker(getUserById(booking.getBooker()));
         bookingDto.setItem(item);

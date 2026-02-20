@@ -68,7 +68,6 @@ public class UserServiceImpl implements UserService {
                 }
             });
         }
-
         if (userDto.getName() != null) {
             existingUser.setName(userDto.getName());
         }

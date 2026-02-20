@@ -1,6 +1,5 @@
 package ru.practicum.gateway.client.item;
 
-
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
