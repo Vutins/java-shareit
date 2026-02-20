@@ -22,7 +22,7 @@ services:
       context: .
       dockerfile: server/Dockerfile
     ports:
-      - "8080:8080"
+      - "9090:9090"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
       - SPRING_DATASOURCE_USERNAME=dbuser
@@ -35,7 +35,7 @@ services:
       context: .
       dockerfile: gateway/Dockerfile
     ports:
-      - "9090:9090"
+      - "8080:8080"
     environment:
       - SHAREIT_SERVER_URL=http://server:8080
     depends_on:
