@@ -1,6 +1,7 @@
 package ru.practicum.gateway.client.item;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,14 +11,11 @@ import ru.practicum.dto.item.ItemDto;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/items")
 public class ItemController {
 
     private final ItemClient itemClient;
-
-    public ItemController(ItemClient itemClient) {
-        this.itemClient = itemClient;
-    }
 
     @GetMapping("/{itemId}")
     @ResponseStatus(HttpStatus.OK)
